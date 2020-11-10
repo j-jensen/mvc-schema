@@ -1,6 +1,6 @@
 ﻿namespace MvcSchema.Impl
 {
-    class RouteInformation
+    public class RouteInformation
     {
         public string HttpMethod { get; set; } = "GET";
         public string Area { get; set; } = "";

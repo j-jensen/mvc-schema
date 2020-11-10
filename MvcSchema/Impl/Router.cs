@@ -25,8 +25,8 @@ namespace MvcSchema.Impl
             {
                 var routeData = new RouteData(context.RouteData);
                 routeData.Routers.Add(m_defaultRouter);
-                routeData.Values["controller"] = "mvc-schema";
-                routeData.Values["action"] = "get-schema";
+                routeData.Values["controller"] = "mvcschema";
+                routeData.Values["action"] = "getschema";
                 context.RouteData = routeData;
                 await m_defaultRouter.RouteAsync(context);
             }

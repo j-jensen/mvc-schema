@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
 using System.Collections.Generic;
@@ -10,16 +10,16 @@ using System.Text;
 
 namespace MvcSchema.Impl
 {
-    class MvcSchemaService: IMvcSchema
+    class MvcSchemaAnalyzer: IMvcSchemaAnalyzer
     {
         private readonly IActionDescriptorCollectionProvider m_actionDescriptorCollectionProvider;
 
-        public MvcSchemaService(IActionDescriptorCollectionProvider actionDescriptorCollectionProvider)
+        public MvcSchemaAnalyzer(IActionDescriptorCollectionProvider actionDescriptorCollectionProvider)
         {
             m_actionDescriptorCollectionProvider = actionDescriptorCollectionProvider;
         }
 
-        public object GetSchema()
+        public IEnumerable<RouteInformation> GetSchema()
         {
             List<RouteInformation> ret = new List<RouteInformation>();
 
