@@ -32,7 +32,7 @@ namespace MvcSchema.Analyzer.Types
         {
             get
             {
-                return _typeDescriptors.Select(d => d.Value);
+                return _types.Select(d => d.Value).Concat(_typeDescriptors.Select(d => d.Value));
             }
         }
 
