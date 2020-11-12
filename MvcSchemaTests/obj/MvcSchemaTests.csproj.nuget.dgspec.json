@@ -85,7 +85,7 @@
       }
     },
     "C:\\repos\\mvc-schema\\MvcSchema\\MvcSchema.csproj": {
-      "version": "1.0.9",
+      "version": "1.0.15",
       "restore": {
         "projectUniqueName": "C:\\repos\\mvc-schema\\MvcSchema\\MvcSchema.csproj",
         "projectName": "MvcSchema",

@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using MvcSchema.Analyzer.Types;
 using MvcSchema.AspNetCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace MvcSchema.Analyzer
 {
@@ -94,8 +94,8 @@ namespace MvcSchema.Analyzer
             }
 
             return new Schema { 
-            Routes= ret,
-            Types = _typeparser.Types
+            Routes= ret.ToArray(),
+            Types = _typeparser.TypeDescriptors.ToArray()
             };
         }
     }

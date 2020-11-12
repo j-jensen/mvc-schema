@@ -8,8 +8,8 @@ namespace MvcSchema.Analyzer
 {
     public class Schema
     {
-        public IEnumerable<RouteInformation> Routes { get; set; }
+        public RouteInformation[] Routes { get; set; }
 
-        public IEnumerable<IType> Types { get; set; }
+        public TypeDescriptor[] Types { get; set; }
     }
 }

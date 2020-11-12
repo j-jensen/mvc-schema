@@ -11,9 +11,9 @@ namespace MvcSchemaTests.Analyzer
     {
 
         [Test]
-        public void Test1()
+        public void GetSchema_should_return_Schema()
         {
-            var arg = new { a = 1, b = "2" };
+            var arg = new { a = 1, b = new string[] { "2" } };
             var adcp = Substitute.For<IActionDescriptorCollectionProvider>();
             var adc = new ActionDescriptorCollection(new List<ActionDescriptor> {
                 new ActionDescriptor {

@@ -11,7 +11,7 @@
     <OutputType>Library</OutputType>
     <AssemblyVersion>1.0.0.1</AssemblyVersion>
     <IsPackable>true</IsPackable>
-    <Version>1.0.9</Version>
+    <Version>1.0.15</Version>
   </PropertyGroup>
 
 </Project>

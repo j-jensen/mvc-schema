@@ -9,7 +9,7 @@
       "MvcSchemaTests/1.0.0": {
         "dependencies": {
           "Microsoft.NET.Test.Sdk": "16.5.0",
-          "MvcSchema": "1.0.9",
+          "MvcSchema": "1.0.14",
           "NSubstitute": "4.2.2",
           "NUnit": "3.12.0",
           "NUnit3TestAdapter": "3.16.1"
@@ -911,7 +911,7 @@
           }
         }
       },
-      "MvcSchema/1.0.9": {
+      "MvcSchema/1.0.14": {
         "runtime": {
           "MvcSchema.dll": {}
         }
@@ -1386,7 +1386,7 @@
       "path": "system.xml.xpath.xmldocument/4.3.0",
       "hashPath": "system.xml.xpath.xmldocument.4.3.0.nupkg.sha512"
     },
-    "MvcSchema/1.0.9": {
+    "MvcSchema/1.0.14": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
