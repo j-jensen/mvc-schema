@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace MvcSchemaTests.Analyzer
 {
-    public class TypeParserTests
+    public partial class TypeParserTests
     {
         [Test]
         public void Object_types_should_return_TypeKindObject_and_collect_Type()
@@ -32,7 +32,6 @@ namespace MvcSchemaTests.Analyzer
             var actual = sut.ParseType(typeof(Branch));
 
             Assert.AreEqual(DataType.Object, actual.JsType);
-            Assert.AreEqual(1, sut.TypeDescriptors.Count());
 
             var collectedType = sut.TypeDescriptors.OfType<ObjectDescriptor>().First();
 
@@ -81,6 +80,34 @@ namespace MvcSchemaTests.Analyzer
             Assert.AreEqual(Kind.None, actual.Kind);
             Assert.AreEqual(DataType.String, actual.JsType);
         }
+
+        [Test]
+        public void Void_should_return_undefined_type()
+        {
+            var sut = new TypeParser();
+
+            var actual = sut.ParseType(typeof(void));
+            Assert.AreEqual(DataType.Undefined, actual.JsType);
+            Assert.AreEqual(Kind.None, actual.Kind);
+        }
+        [Test]
+        public void POCO_object_should_return_type_with_properties()
+        {
+            var sut = new TypeParser();
+            var actual = sut.ParseType(typeof(POCO));
+
+            Assert.AreEqual(typeof(POCO), actual.ClrType);
+
+            var objectType = sut.TypeDescriptors.OfType<ObjectDescriptor>().FirstOrDefault();
+            Assert.AreEqual(3, objectType.Properties.Length);
+        }
+    }
+
+    class POCO
+    {
+        public int PropA { get; set; }
+        public string PropB { get; set; }
+        public bool PropC { get; set; }
     }
 
     class Branch

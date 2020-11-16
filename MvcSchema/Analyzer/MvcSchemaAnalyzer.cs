@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Abstractions;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -24,12 +25,23 @@ namespace MvcSchema.Analyzer
 
         public Schema GetSchema()
         {
-            List<RouteInformation> ret = new List<RouteInformation>();
+            List<ActionDescriptor> ret = new List<ActionDescriptor>();
 
             var routes = m_actionDescriptorCollectionProvider.ActionDescriptors.Items;
-            foreach (ActionDescriptor ad in routes)
+            foreach (Microsoft.AspNetCore.Mvc.Abstractions.ActionDescriptor ad in routes)
             {
-                RouteInformation info = new RouteInformation();
+                ActionDescriptor info = new ActionDescriptor();
+
+                // Path and Invocation of Controller/Action
+                if (ad is ControllerActionDescriptor)
+                {
+                    var cad = ad as ControllerActionDescriptor;
+                    if (info.Path == "")
+                    {
+                        info.Path = $"/{cad.ControllerName}/{cad.ActionName}";
+                    }
+                    info.Invocation = $"{cad.ControllerName}Controller.{cad.ActionName}";
+                }
 
                 // Area
                 if (ad.RouteValues.ContainsKey("area"))
@@ -51,17 +63,6 @@ namespace MvcSchema.Analyzer
                     info.Path = $"/{ad.AttributeRouteInfo.Template}";
                 }
 
-                // Path and Invocation of Controller/Action
-                if (ad is ControllerActionDescriptor)
-                {
-                    var cad = ad as ControllerActionDescriptor;
-                    if (info.Path == "")
-                    {
-                        info.Path = $"/{cad.ControllerName}/{cad.ActionName}";
-                    }
-                    info.Invocation = $"{cad.ControllerName}Controller.{cad.ActionName}";
-                }
-
                 // Extract HTTP Verb
                 if (ad.ActionConstraints != null && ad.ActionConstraints.Select(t => t.GetType()).Contains(typeof(HttpMethodActionConstraint)))
                 {
@@ -80,21 +81,28 @@ namespace MvcSchema.Analyzer
                     info.Arguments = ad.Parameters.Select(_typeparser.ParseParameter).ToArray();
                 }
 
-                // Special controller path
-                if (info.Path == "/MvcSchema/GetSchema")
+                // Return type
+                if (ad is ControllerActionDescriptor)
                 {
-                    info.Path = MvcSchemaServiceRouteBuilderExtensions.MvcSchemaUrlPath;
+                    var cad = ad as ControllerActionDescriptor;
+                    info.ReturnType = _typeparser.ParseType(cad.MethodInfo.ReturnType);
                 }
 
                 // Additional information of invocation
                 info.Invocation += $" ({ad.DisplayName})";
+
+                // Special controller path
+                if (info.Path == "/MvcSchema/GetSchema")
+                {
+                    continue;
+                }
 
                 // Generating List
                 ret.Add(info);
             }
 
             return new Schema { 
-            Routes= ret.ToArray(),
+            Actions= ret.ToArray(),
             Types = _typeparser.TypeDescriptors.ToArray()
             };
         }

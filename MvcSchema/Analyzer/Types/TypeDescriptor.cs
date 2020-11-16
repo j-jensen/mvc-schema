@@ -8,7 +8,7 @@ namespace MvcSchema.Analyzer.Types
     {
         public TypeDescriptor(Type type, Kind kind = Kind.None)
         {
-            Name = $"{type.Namespace}.{type.Name}";
+            Name = GetName(type);
             Kind = kind;
             ClrType = type;
             if (type.IsPrimitive)
@@ -24,6 +24,10 @@ namespace MvcSchema.Analyzer.Types
             {
                 JsType = DataType.String;
             }
+            else if (type == typeof(void))
+            {
+                JsType = DataType.Undefined;
+            }
             else
             {
                 JsType = DataType.Object;
@@ -35,5 +39,7 @@ namespace MvcSchema.Analyzer.Types
         public Type ClrType { get; private set; }
         public DataType JsType { get; private set; }
         public Kind Kind { get; private set; }
+
+        public static string GetName(Type type) => $"{type.Namespace}.{type.Name}";
     }
 }

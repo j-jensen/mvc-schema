@@ -8,7 +8,7 @@ namespace MvcSchema.Analyzer
 {
     public class Schema
     {
-        public RouteInformation[] Routes { get; set; }
+        public ActionDescriptor[] Actions { get; set; }
 
         public TypeDescriptor[] Types { get; set; }
     }

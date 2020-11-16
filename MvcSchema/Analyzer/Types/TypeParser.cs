@@ -15,6 +15,9 @@ namespace MvcSchema.Analyzer.Types
         {
             _typeDescriptors = new Dictionary<Type, TypeDescriptor>();
             _types = new Dictionary<Type, TypeDescriptor>();
+            _types.Add(typeof(object), new TypeDescriptor(typeof(object)));
+            _types.Add(typeof(void), new TypeDescriptor(typeof(void)));
+
             // String is special - We want it to be a type string, not a type char[]
             _types.Add(typeof(string), new TypeDescriptor(typeof(string)));
         }
@@ -95,6 +98,7 @@ namespace MvcSchema.Analyzer.Types
                 _types.Add(clrType, array);
                 return array;
             }
+
             // Array like
             var collectionInterface = clrType.GetInterfaces().FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>));
             if (collectionInterface != null)
@@ -107,6 +111,20 @@ namespace MvcSchema.Analyzer.Types
                 var array = new TypeDescriptor(arrayType, Kind.Array);
                 _types.Add(clrType, array);
                 return array;
+            }
+
+            // Async
+            var taskInterface = clrType.GetInterfaces()
+                .FirstOrDefault(i => i.UnderlyingSystemType == typeof(IAsyncResult));
+            if (taskInterface != null)
+            {
+                if (clrType == typeof(Task))
+                {
+                    return ParseType(typeof(void));
+                }
+                var resultPI = clrType.GetProperty("Result", BindingFlags.Public | BindingFlags.Instance);
+                var objType = resultPI.PropertyType;
+                return ParseType(objType);
             }
 
             if (clrType.IsClass)

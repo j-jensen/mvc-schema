@@ -22,7 +22,7 @@
   },
   "targets": {
     ".NETCoreApp,Version=v3.1": {
-      "MvcSchema/1.0.15": {
+      "MvcSchema/1.0.18": {
         "dependencies": {
           "Microsoft.AspNetCore.Antiforgery": "3.1.0.0",
           "Microsoft.AspNetCore.Authentication.Abstractions": "3.1.0.0",
@@ -2009,7 +2009,7 @@
     }
   },
   "libraries": {
-    "MvcSchema/1.0.15": {
+    "MvcSchema/1.0.18": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

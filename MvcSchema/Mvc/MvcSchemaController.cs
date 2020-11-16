@@ -10,11 +10,11 @@ namespace MvcSchema.Mvc
         {
             _mvcSchemaAalyzer = mvcSchemaAalyzer;
         }
-        public IActionResult GetSchema()
+        public ActionResult<Schema> GetSchema()
         {
             var infos = _mvcSchemaAalyzer.GetSchema();
 
-            return new JsonResult(infos);
+            return infos;
         }
     }
 }

@@ -5,6 +5,7 @@
         Boolean,
         Number,
         String,
-        Object
+        Object,
+        Undefined
     }
 }

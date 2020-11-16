@@ -15,13 +15,13 @@ namespace MvcSchemaTests.Analyzer
         {
             var arg = new { a = 1, b = new string[] { "2" } };
             var adcp = Substitute.For<IActionDescriptorCollectionProvider>();
-            var adc = new ActionDescriptorCollection(new List<ActionDescriptor> {
-                new ActionDescriptor {
+            var adc = new ActionDescriptorCollection(new List<Microsoft.AspNetCore.Mvc.Abstractions.ActionDescriptor> {
+                new Microsoft.AspNetCore.Mvc.Abstractions.ActionDescriptor {
                     Parameters = new ParameterDescriptor[]{
                     new ParameterDescriptor
                     {
                         Name="Test",
-                        ParameterType=arg.GetType()
+                        ParameterType= arg.GetType()
                     }
                     }
                 }
