@@ -5,7 +5,12 @@ VisualStudioVersion = 16.0.30621.155
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MvcSchema", "MvcSchema.csproj", "{9D158A9C-1DDD-43B4-B91F-9248C7638808}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvcSchemaTests", "..\MvcSchemaTests\MvcSchemaTests.csproj", "{C96FA70D-AF96-4ACA-B3F7-9C9B8E498B61}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MvcSchemaTests", "..\MvcSchemaTests\MvcSchemaTests.csproj", "{C96FA70D-AF96-4ACA-B3F7-9C9B8E498B61}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8C9C151F-98E9-4DA2-A33E-D5EC00A95E49}"
+	ProjectSection(SolutionItems) = preProject
+		.filenesting.json = .filenesting.json
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
