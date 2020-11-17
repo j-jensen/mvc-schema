@@ -17,6 +17,6 @@ jobs:
     - name: Install dependencies
       run: dotnet restore .\mvcschema\MvcSchema.csproj
     - name: Build
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build .\MvcSchema\MvcSchema.csproj --configuration Release --no-restore
     - name: Test
       run: dotnet test .\MvcSchemaTests\MvcSchemaTests.csproj --no-restore --verbosity normal
