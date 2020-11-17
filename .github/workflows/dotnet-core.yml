@@ -15,8 +15,8 @@ jobs:
       with:
         dotnet-version: 3.1.301
     - name: Install dependencies
-      run: dotnet restore
+      run: dotnet restore .\mvcschema\MvcSchema.csproj
     - name: Build
       run: dotnet build --configuration Release --no-restore
     - name: Test
-      run: dotnet test --no-restore --verbosity normal
+      run: dotnet test .\MvcSchemaTests\MvcSchemaTests.csproj --no-restore --verbosity normal
