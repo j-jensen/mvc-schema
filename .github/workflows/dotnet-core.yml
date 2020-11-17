@@ -15,7 +15,7 @@ jobs:
       with:
         dotnet-version: 3.1.301
     - name: Install dependencies
-      run: dotnet restore .\mvcschema\MvcSchema.csproj
+      run: dotnet restore  .\MvcSchema\MvcSchema.sln
     - name: Build
       run: dotnet build .\MvcSchema\MvcSchema.csproj --configuration Release --no-restore
     - name: Test
