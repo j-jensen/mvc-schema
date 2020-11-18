@@ -65,7 +65,7 @@ namespace MvcSchema.Analyzer.Types
                 {
                     underlyingType = ParseType(underlyingClrType, stack);
                 }
-                TypeDescriptor nullable = new TypeDescriptor(underlyingClrType, Kind.Nullable);
+                var nullable = new TypeDescriptor($"{underlyingType.ID}?", underlyingClrType, underlyingType.DataType, Kind.Nullable);
                 _typeDescriptors.Add(ID, nullable);
                 return nullable;
             }
@@ -114,7 +114,7 @@ namespace MvcSchema.Analyzer.Types
                 return ParseType(valuePI.PropertyType, stack);
             }
             // Derived from ActionResult MVC
-            if (clrType.IsSubclassOf(typeof(ActionResult)))
+            if (clrType == typeof(ActionResult) || clrType.IsSubclassOf(typeof(ActionResult)))
             {
                 if (clrType == typeof(ViewResult))
                 {
@@ -160,7 +160,7 @@ namespace MvcSchema.Analyzer.Types
 
         private TypeDescriptor ParseArrayType(Type arrayType, string[] stack)
         {
-            var ID = $"Array<{arrayType.GetID()}>";
+            var ID = $"{arrayType.GetID()}[]";
             if (_typeDescriptors.TryGetValue(ID, out var typeDescriptor))
             {
                 return typeDescriptor;

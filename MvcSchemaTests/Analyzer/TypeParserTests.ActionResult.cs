@@ -11,6 +11,7 @@ namespace MvcSchemaTests.Analyzer
         [Test(Description = "ActionResults from dotNetCore")]
         [TestCase(typeof(ActionResult<POCO>), typeof(POCO))]
         [TestCase(typeof(Task<ActionResult<POCO>>), typeof(POCO))]
+        [TestCase(typeof(Task<ActionResult>), typeof(string))]
         public void ActionResultOfT_shold_return_type_of_value_property(Type ar, Type result)
         {
             var sut = new TypeParser();

@@ -33,6 +33,7 @@ namespace MvcSchemaTests.Analyzer
             var actual = sut.ParseType(type);
             var underlyingType = Nullable.GetUnderlyingType(type);
 
+            Assert.AreEqual($"{underlyingType.GetID()}?", actual.ID);
             Assert.AreSame(underlyingType, actual.ClrType);
             Assert.AreEqual(Kind.Nullable, actual.Kind);
         }
@@ -67,6 +68,17 @@ namespace MvcSchemaTests.Analyzer
             var actual1 = sut.ParseType(typeof(string[]));
             var actual2 = sut.ParseType(typeof(List<string>));
             Assert.AreSame(actual1, actual2, $"{actual1.ID} == {actual2.ID}");
+        }
+
+        [Test]
+        public void Array_types_should_have_array_type_id()
+        {
+            var array = typeof(string[]);
+            var sut = new TypeParser();
+
+            var actual1 = sut.ParseType(array);
+
+            Assert.AreEqual($"{array.GetElementType().GetID()}[]", actual1.ID);
         }
 
         [Test]
