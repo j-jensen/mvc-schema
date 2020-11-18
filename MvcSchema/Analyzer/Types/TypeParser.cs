@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Abstractions;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,35 +10,29 @@ namespace MvcSchema.Analyzer.Types
 {
     public class TypeParser
     {
-        private readonly Dictionary<Type, TypeDescriptor> _types;
         private readonly Dictionary<Type, TypeDescriptor> _typeDescriptors;
         public TypeParser()
         {
-            _typeDescriptors = new Dictionary<Type, TypeDescriptor>();
-            _types = new Dictionary<Type, TypeDescriptor>();
-            _types.Add(typeof(object), new TypeDescriptor(typeof(object)));
-            _types.Add(typeof(void), new TypeDescriptor(typeof(void)));
+            _typeDescriptors = new Dictionary<Type, TypeDescriptor>
+            {
+                { typeof(object), new TypeDescriptor(typeof(object)) },
+                { typeof(void), new TypeDescriptor(typeof(void)) },
 
-            // String is special - We want it to be a type string, not a type char[]
-            _types.Add(typeof(string), new TypeDescriptor(typeof(string)));
+                // String is special - We want it to be a type string, not a type char[]
+                { typeof(string), new TypeDescriptor(typeof(string)) }
+            };
         }
 
-        public Property ParseProperty(PropertyInfo pi, TypeDescriptor owner)
+        public Property ParseProperty(PropertyInfo pi, TypeDescriptor owner = null)
         {
             return new Property
             {
                 Name = pi.Name,
-                Type = owner.ClrType == pi.PropertyType ? owner : ParseType(pi.PropertyType)
+                Type = owner?.ClrType == pi.PropertyType ? owner : ParseType(pi.PropertyType)
             };
         }
 
-        public IEnumerable<TypeDescriptor> TypeDescriptors
-        {
-            get
-            {
-                return _types.Select(d => d.Value).Concat(_typeDescriptors.Select(d => d.Value));
-            }
-        }
+        public IEnumerable<TypeDescriptor> TypeDescriptors => _typeDescriptors.Select(td => td.Value);
 
         public Argument ParseParameter(ParameterDescriptor propertyDescriptor)
         {
@@ -51,7 +46,7 @@ namespace MvcSchema.Analyzer.Types
         public TypeDescriptor ParseType(Type clrType)
         {
             // Do we allready have the type?
-            if (_types.TryGetValue(clrType, out TypeDescriptor type))
+            if (_typeDescriptors.TryGetValue(clrType, out TypeDescriptor type))
             {
                 return type;
             }
@@ -59,21 +54,21 @@ namespace MvcSchema.Analyzer.Types
             // Numbers, Char and bool
             if (clrType.IsPrimitive)
             {
-                var primitiveType = new TypeDescriptor(clrType);
-                _types.Add(clrType, primitiveType);
+                TypeDescriptor primitiveType = new TypeDescriptor(clrType);
+                _typeDescriptors.Add(clrType, primitiveType);
                 return primitiveType;
             }
 
             // Nullable types
-            var underlyingClrType = Nullable.GetUnderlyingType(clrType);
+            Type underlyingClrType = Nullable.GetUnderlyingType(clrType);
             if (underlyingClrType != null)
             {
-                if (!_types.TryGetValue(underlyingClrType, out TypeDescriptor underlyingType))
+                if (!_typeDescriptors.TryGetValue(underlyingClrType, out TypeDescriptor underlyingType))
                 {
                     underlyingType = ParseType(underlyingClrType);
                 }
-                var nullable = new TypeDescriptor(underlyingClrType, Kind.Nullable);
-                _types.Add(clrType, nullable);
+                TypeDescriptor nullable = new TypeDescriptor(underlyingClrType, Kind.Nullable);
+                _typeDescriptors.Add(clrType, nullable);
                 return nullable;
             }
 
@@ -81,40 +76,40 @@ namespace MvcSchema.Analyzer.Types
             if (clrType.IsEnum)
             {
                 _typeDescriptors.Add(clrType, new EnumDescriptor(clrType));
-                var enumType = new TypeDescriptor(clrType, Kind.Enum);
-                _types.Add(clrType, enumType);
+                TypeDescriptor enumType = new TypeDescriptor(clrType, Kind.Enum);
+                _typeDescriptors.Add(clrType, enumType);
                 return enumType;
             }
 
             // Array
             if (clrType.IsArray)
             {
-                var arrayType = clrType.GetElementType();
-                if (!_types.TryGetValue(arrayType, out TypeDescriptor underlyingType))
+                Type arrayType = clrType.GetElementType();
+                if (!_typeDescriptors.TryGetValue(arrayType, out TypeDescriptor underlyingType))
                 {
                     underlyingType = ParseType(arrayType);
                 }
-                var array = new TypeDescriptor(arrayType, Kind.Array);
-                _types.Add(clrType, array);
+                TypeDescriptor array = new TypeDescriptor(arrayType, Kind.Array);
+                _typeDescriptors.Add(clrType, array);
                 return array;
             }
 
             // Array like
-            var collectionInterface = clrType.GetInterfaces().FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>));
+            Type collectionInterface = clrType.GetInterfaces().FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>));
             if (collectionInterface != null)
             {
-                var arrayType = collectionInterface.GetGenericArguments().First();
-                if (!_types.TryGetValue(arrayType, out TypeDescriptor underlyingType))
+                Type arrayType = collectionInterface.GetGenericArguments().First();
+                if (!_typeDescriptors.TryGetValue(arrayType, out TypeDescriptor underlyingType))
                 {
                     underlyingType = ParseType(arrayType);
                 }
-                var array = new TypeDescriptor(arrayType, Kind.Array);
-                _types.Add(clrType, array);
+                TypeDescriptor array = new TypeDescriptor(arrayType, Kind.Array);
+                _typeDescriptors.Add(clrType, array);
                 return array;
             }
 
             // Async
-            var taskInterface = clrType.GetInterfaces()
+            Type taskInterface = clrType.GetInterfaces()
                 .FirstOrDefault(i => i.UnderlyingSystemType == typeof(IAsyncResult));
             if (taskInterface != null)
             {
@@ -122,19 +117,39 @@ namespace MvcSchema.Analyzer.Types
                 {
                     return ParseType(typeof(void));
                 }
-                var resultPI = clrType.GetProperty("Result", BindingFlags.Public | BindingFlags.Instance);
-                var objType = resultPI.PropertyType;
+                PropertyInfo resultPI = clrType.GetProperty("Result", BindingFlags.Public | BindingFlags.Instance);
+                Type objType = resultPI.PropertyType;
                 return ParseType(objType);
+            }
+
+            // ActionResult<T> - AspNetCore 3
+            if (clrType.Name == "ActionResult`1" && clrType.Namespace == "Microsoft.AspNetCore.Mvc")
+            {
+                PropertyInfo valuePI = clrType.GetProperty("Value", BindingFlags.Public | BindingFlags.Instance);
+                return ParseType(valuePI.PropertyType);
+            }
+            // Derived from ActionResult MVC
+            if (clrType.IsSubclassOf(typeof(ActionResult)))
+            {
+                if (clrType == typeof(ViewResult))
+                {
+                    return new TypeDescriptor("ViewString", typeof(string), DataType.String, Kind.None);
+                }
+                if (clrType == typeof(JsonResult))
+                {
+                    return new TypeDescriptor("JsonString", typeof(string), DataType.String, Kind.None);
+                }
+                return ParseType(typeof(string));
             }
 
             if (clrType.IsClass)
             {
-                var objectType = new TypeDescriptor(clrType);
+                TypeDescriptor objectType = new TypeDescriptor(clrType);
                 if (!_typeDescriptors.ContainsKey(clrType))
                 {
                     _typeDescriptors.Add(clrType, new ObjectDescriptor(clrType, GetProperties(clrType, objectType)));
                 }
-                _types.Add(clrType, objectType);
+                _typeDescriptors.Add(clrType, objectType);
                 return objectType;
             }
 

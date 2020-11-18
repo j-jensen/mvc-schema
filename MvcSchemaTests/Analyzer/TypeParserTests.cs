@@ -17,25 +17,12 @@ namespace MvcSchemaTests.Analyzer
             var sut = new TypeParser();
             var actual = sut.ParseType(obj.GetType());
 
-            Assert.AreEqual(DataType.Object, actual.JsType);
+            Assert.AreEqual(DataType.Object, actual.DataType);
 
             // Is TypeDescriptor collected
-            var collectedType = sut.TypeDescriptors.First(td => td.Name == actual.Name);
+            var collectedType = sut.TypeDescriptors.First(td => td.ID == actual.ID);
 
             Assert.NotNull(collectedType);
-        }
-
-        [Test]
-        public void Nested_object_types_should_not_stack_overflow()
-        {
-            var sut = new TypeParser();
-            var actual = sut.ParseType(typeof(Branch));
-
-            Assert.AreEqual(DataType.Object, actual.JsType);
-
-            var collectedType = sut.TypeDescriptors.OfType<ObjectDescriptor>().First();
-
-            Assert.AreEqual(1, collectedType.Properties.Length);
         }
 
         [TestCase(typeof(int?))]
@@ -78,7 +65,7 @@ namespace MvcSchemaTests.Analyzer
 
             var actual = sut.ParseType(typeof(string));
             Assert.AreEqual(Kind.None, actual.Kind);
-            Assert.AreEqual(DataType.String, actual.JsType);
+            Assert.AreEqual(DataType.String, actual.DataType);
         }
 
         [Test]
@@ -87,7 +74,7 @@ namespace MvcSchemaTests.Analyzer
             var sut = new TypeParser();
 
             var actual = sut.ParseType(typeof(void));
-            Assert.AreEqual(DataType.Undefined, actual.JsType);
+            Assert.AreEqual(DataType.Undefined, actual.DataType);
             Assert.AreEqual(Kind.None, actual.Kind);
         }
         [Test]

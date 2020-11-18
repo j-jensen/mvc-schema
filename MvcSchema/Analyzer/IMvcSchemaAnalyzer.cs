@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace MvcSchema.Analyzer
+﻿namespace MvcSchema.Analyzer
 {
     public interface IMvcSchemaAnalyzer
     {

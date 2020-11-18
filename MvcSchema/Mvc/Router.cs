@@ -3,10 +3,10 @@ using System.Threading.Tasks;
 
 namespace MvcSchema.Mvc
 {
-    class Router : IRouter
+    internal class Router : IRouter
     {
-        IRouter m_defaultRouter;
-        string m_routePath;
+        private readonly IRouter m_defaultRouter;
+        private readonly string m_routePath;
 
         public Router(IRouter defaultRouter, string routePath)
         {
@@ -23,7 +23,7 @@ namespace MvcSchema.Mvc
         {
             if (context.HttpContext.Request.Path == m_routePath)
             {
-                var routeData = new RouteData(context.RouteData);
+                RouteData routeData = new RouteData(context.RouteData);
                 routeData.Routers.Add(m_defaultRouter);
                 routeData.Values["controller"] = "mvcschema";
                 routeData.Values["action"] = "getschema";

@@ -17,7 +17,18 @@ namespace MvcSchemaTests.Analyzer
         {
             var type = new TypeDescriptor(clrType);
 
-            Assert.AreEqual(expected, type.JsType);
+            Assert.AreEqual(expected, type.DataType);
+        }
+
+        [TestCase(typeof(string), "System.String")]
+        [TestCase(typeof(int), "System.Int32")]
+        [TestCase(typeof(Nullable<int>), "System.Nullable<System.Int32>")]
+        [TestCase(typeof(Nullable<float>), "System.Nullable<System.Single>")]
+        [TestCase(typeof(Tuple<float,int>), "System.Tuple<System.Single,System.Int32>")]
+        public void Typenaming_should_follow_rules(Type type, string exspected)
+        {
+            var actual = TypeDescriptor.GetID(type);
+            Assert.AreEqual(exspected, actual);
         }
     }
 }

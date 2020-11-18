@@ -1,6 +1,4 @@
 ﻿using MvcSchema.Analyzer.Types;
-using System;
-using System.Text.Json;
 
 namespace MvcSchema.Analyzer
 {
@@ -12,10 +10,5 @@ namespace MvcSchema.Analyzer
         public string Invocation { get; set; } = "";
         public Argument[] Arguments { get; set; } = new Argument[0];
         public TypeDescriptor ReturnType { get; internal set; }
-    }
-
-    public class ActionMethod
-    {
-
     }
 }

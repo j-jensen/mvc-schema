@@ -6,40 +6,86 @@ namespace MvcSchema.Analyzer.Types
 {
     public class TypeDescriptor
     {
-        public TypeDescriptor(Type type, Kind kind = Kind.None)
+        public TypeDescriptor(string id, Type type, DataType datatype, Kind kind = Kind.None)
         {
-            Name = GetName(type);
-            Kind = kind;
             ClrType = type;
-            if (type.IsPrimitive)
+            ID = id;
+            Kind = kind;
+            DataType = datatype;
+        }
+        public TypeDescriptor(Type clrType, Kind kind = Kind.None)
+        {
+            ID = GetID(clrType);
+            Kind = kind;
+            ClrType = clrType;
+            if (clrType.IsPrimitive)
             {
-                if (type == typeof(bool))
-                    JsType = DataType.Boolean;
-                else if (type == typeof(char))
-                    JsType = DataType.String;
+                if (clrType == typeof(bool))
+                {
+                    DataType = DataType.Boolean;
+                }
+                else if (clrType == typeof(char))
+                {
+                    DataType = DataType.String;
+                }
                 else
-                    JsType = DataType.Number;
+                {
+                    DataType = DataType.Number;
+                }
             }
-            else if (type == typeof(string))
+            else if (clrType == typeof(string))
             {
-                JsType = DataType.String;
+                DataType = DataType.String;
             }
-            else if (type == typeof(void))
+            else if (clrType == typeof(void))
             {
-                JsType = DataType.Undefined;
+                DataType = DataType.Undefined;
             }
             else
             {
-                JsType = DataType.Object;
+                DataType = DataType.Object;
             }
         }
 
-        public string Name { get; private set; }
+        /// <summary>
+        /// Unique id of type.
+        /// </summary>
+        public string ID { get; private set; }
+        /// <summary>
+        /// CLR type
+        /// </summary>
         [JsonIgnore]
         public Type ClrType { get; private set; }
-        public DataType JsType { get; private set; }
+        /// <summary>
+        /// Javascript datatype
+        /// </summary>
+        public DataType DataType { get; private set; }
+        /// <summary>
+        /// Type capability
+        /// </summary>
         public Kind Kind { get; private set; }
 
-        public static string GetName(Type type) => $"{type.Namespace}.{type.Name}";
+        public static string GetID(Type type)
+        {
+            string name = type.Name;
+            if (type.IsGenericType)
+            {
+                int iBacktick = name.IndexOf('`');
+                if (iBacktick > 0)
+                {
+                    name = name.Remove(iBacktick);
+                }
+                name += "<";
+                Type[] typeParameters = type.GetGenericArguments();
+                for (int i = 0; i < typeParameters.Length; ++i)
+                {
+                    string typeParamName = GetID(typeParameters[i]);
+                    name += (i == 0 ? typeParamName : "," + typeParamName);
+                }
+                name += ">";
+            }
+
+            return $"{type.Namespace}.{name}";
+        }
     }
 }

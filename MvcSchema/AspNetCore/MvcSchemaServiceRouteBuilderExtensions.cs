@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
-using MvcSchema.Analyzer;
 using MvcSchema.Mvc;
 
 namespace MvcSchema.AspNetCore
@@ -18,7 +17,7 @@ namespace MvcSchema.AspNetCore
         public static IEndpointRouteBuilder MapMvcSchema(this IEndpointRouteBuilder builder, string routeAnalyzerUrlPath)
         {
             MvcSchemaUrlPath = routeAnalyzerUrlPath;
-            builder.MapControllerRoute("mvc-schema", MvcSchemaUrlPath, new { controller= "MvcSchema", action= "GetSchema" });
+            builder.MapControllerRoute("mvc-schema", MvcSchemaUrlPath, new { controller = "MvcSchema", action = "GetSchema" });
             return builder;
         }
     }

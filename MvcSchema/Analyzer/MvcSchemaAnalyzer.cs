@@ -1,11 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Abstractions;
-using Microsoft.AspNetCore.Mvc.ActionConstraints;
+﻿using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MvcSchema.Analyzer.Types;
-using MvcSchema.AspNetCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +24,7 @@ namespace MvcSchema.Analyzer
         {
             List<ActionDescriptor> ret = new List<ActionDescriptor>();
 
-            var routes = m_actionDescriptorCollectionProvider.ActionDescriptors.Items;
+            IReadOnlyList<Microsoft.AspNetCore.Mvc.Abstractions.ActionDescriptor> routes = m_actionDescriptorCollectionProvider.ActionDescriptors.Items;
             foreach (Microsoft.AspNetCore.Mvc.Abstractions.ActionDescriptor ad in routes)
             {
                 ActionDescriptor info = new ActionDescriptor();
@@ -35,7 +32,7 @@ namespace MvcSchema.Analyzer
                 // Path and Invocation of Controller/Action
                 if (ad is ControllerActionDescriptor)
                 {
-                    var cad = ad as ControllerActionDescriptor;
+                    ControllerActionDescriptor cad = ad as ControllerActionDescriptor;
                     if (info.Path == "")
                     {
                         info.Path = $"/{cad.ControllerName}/{cad.ActionName}";
@@ -52,7 +49,7 @@ namespace MvcSchema.Analyzer
                 // Path and Invocation of Razor Pages
                 if (ad is PageActionDescriptor)
                 {
-                    var pad = ad as PageActionDescriptor;
+                    PageActionDescriptor pad = ad as PageActionDescriptor;
                     info.Path = pad.ViewEnginePath;
                     info.Invocation = pad.RelativePath;
                 }
@@ -84,7 +81,7 @@ namespace MvcSchema.Analyzer
                 // Return type
                 if (ad is ControllerActionDescriptor)
                 {
-                    var cad = ad as ControllerActionDescriptor;
+                    ControllerActionDescriptor cad = ad as ControllerActionDescriptor;
                     info.ReturnType = _typeparser.ParseType(cad.MethodInfo.ReturnType);
                 }
 
@@ -101,9 +98,10 @@ namespace MvcSchema.Analyzer
                 ret.Add(info);
             }
 
-            return new Schema { 
-            Actions= ret.ToArray(),
-            Types = _typeparser.TypeDescriptors.ToArray()
+            return new Schema
+            {
+                Actions = ret.ToArray(),
+                Types = _typeparser.TypeDescriptors.ToArray()
             };
         }
     }
