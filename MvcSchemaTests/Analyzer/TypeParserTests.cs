@@ -49,6 +49,7 @@ namespace MvcSchemaTests.Analyzer
         [TestCase(typeof(string[]))]
         [TestCase(typeof(ICollection<int>))]
         [TestCase(typeof(List<Guid>))]
+        [TestCase(typeof(IEnumerable<Tuple<string, string>>))]
         [TestCase(typeof(IReadOnlyList<object>))]
         public void Array_like_should_return_KindArray(Type arrayLike)
         {
@@ -56,6 +57,16 @@ namespace MvcSchemaTests.Analyzer
 
             var actual = sut.ParseType(arrayLike);
             Assert.AreEqual(Kind.Array, actual.Kind);
+        }
+
+        [Test]
+        public void Arraylike_with_same_type_should_return_same()
+        {
+            var sut = new TypeParser();
+
+            var actual1 = sut.ParseType(typeof(string[]));
+            var actual2 = sut.ParseType(typeof(List<string>));
+            Assert.AreSame(actual1, actual2, $"{actual1.ID} == {actual2.ID}");
         }
 
         [Test]

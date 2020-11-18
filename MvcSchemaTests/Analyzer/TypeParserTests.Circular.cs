@@ -10,16 +10,28 @@ namespace MvcSchemaTests.Analyzer
 {
     public partial class TypeParserTests
     {
-        //[TestCase(typeof(A))]
+        [TestCase(typeof(A))]
         [TestCase(typeof(Type))]
-        //[TestCase(typeof(Branch))]
+        [TestCase(typeof(Branch))]
         public void Circular_types_should_not_throw_StackOverflowException(Type type)
         {
             var sut = new TypeParser();
 
             var actual = sut.ParseType(type);
 
-            Assert.AreEqual(actual.ID, TypeDescriptor.GetID(type));
+            Assert.AreEqual(actual.ID, type.GetID());
+        }
+
+        [Test]
+        public void Circular_types_should_return_type_without_placeholders()
+        {
+            var sut = new TypeParser();
+
+            var actual = sut.ParseType(typeof(Type));
+            var objectDescriptor = (ObjectDescriptor)actual;
+            Assert.NotNull(objectDescriptor);
+            var placeholders = objectDescriptor.Properties.Select(pd=>pd.Type).OfType<Placeholder>().Count();
+            Assert.AreEqual(0, placeholders);
         }
     }
 

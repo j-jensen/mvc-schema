@@ -27,7 +27,7 @@ namespace MvcSchemaTests.Analyzer
         [TestCase(typeof(Tuple<float,int>), "System.Tuple<System.Single,System.Int32>")]
         public void Typenaming_should_follow_rules(Type type, string exspected)
         {
-            var actual = TypeDescriptor.GetID(type);
+            var actual = type.GetID();
             Assert.AreEqual(exspected, actual);
         }
     }

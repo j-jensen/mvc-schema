@@ -17,7 +17,7 @@ namespace MvcSchemaTests.Analyzer
 
             var actual = sut.ParseType(ar);
 
-            Assert.AreEqual(TypeDescriptor.GetID(result), actual.ID);
+            Assert.AreEqual(result.GetID(), actual.ID);
         }
 
         [TestCase(typeof(JsonResult), "JsonString", typeof(string))]
