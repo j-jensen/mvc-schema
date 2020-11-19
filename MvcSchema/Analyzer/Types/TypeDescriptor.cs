@@ -6,18 +6,16 @@ namespace MvcSchema.Analyzer.Types
 {
     public class TypeDescriptor
     {
-        public TypeDescriptor(string id, Type type, DataType datatype, Kind kind = Kind.None)
+        public TypeDescriptor(string typeName, Type type, DataType datatype, Kind kind = Kind.None)
         {
-            ClrType = type;
-            ID = id;
+            TypeName = typeName;
             Kind = kind;
             DataType = datatype;
         }
         public TypeDescriptor(Type clrType, Kind kind = Kind.None)
         {
-            ID = clrType.GetID();
+            TypeName = clrType.GetNamespacedName();
             Kind = kind;
-            ClrType = clrType;
             if (clrType.IsPrimitive)
             {
                 if (clrType == typeof(bool))
@@ -48,14 +46,9 @@ namespace MvcSchema.Analyzer.Types
         }
 
         /// <summary>
-        /// Unique id of type.
+        /// Typename.
         /// </summary>
-        public string ID { get; private set; }
-        /// <summary>
-        /// CLR type
-        /// </summary>
-        [JsonIgnore]
-        public Type ClrType { get; private set; }
+        public string TypeName { get; private set; }
         /// <summary>
         /// Javascript datatype
         /// </summary>

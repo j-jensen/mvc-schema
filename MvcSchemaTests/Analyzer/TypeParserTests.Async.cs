@@ -19,7 +19,7 @@ namespace MvcSchemaTests.Analyzer
             var sut = new TypeParser();
             var actual = sut.ParseType(taskType);
 
-            Assert.AreEqual(type, actual.ClrType);
+            Assert.AreEqual(type.GetNamespacedName(), actual.TypeName);
         }
     }
 }

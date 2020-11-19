@@ -20,7 +20,7 @@ namespace MvcSchemaTests.Analyzer
             Assert.AreEqual(DataType.Object, actual.DataType);
 
             // Is TypeDescriptor collected
-            var collectedType = sut.TypeDescriptors.First(td => td.ID == actual.ID);
+            var collectedType = sut.TypeDescriptors.First(td => td.TypeName == actual.TypeName);
 
             Assert.NotNull(collectedType);
         }
@@ -33,8 +33,7 @@ namespace MvcSchemaTests.Analyzer
             var actual = sut.ParseType(type);
             var underlyingType = Nullable.GetUnderlyingType(type);
 
-            Assert.AreEqual($"{underlyingType.GetID()}?", actual.ID);
-            Assert.AreSame(underlyingType, actual.ClrType);
+            Assert.AreEqual(underlyingType.GetNamespacedName(), actual.TypeName);
             Assert.AreEqual(Kind.Nullable, actual.Kind);
         }
 
@@ -67,7 +66,7 @@ namespace MvcSchemaTests.Analyzer
 
             var actual1 = sut.ParseType(typeof(string[]));
             var actual2 = sut.ParseType(typeof(List<string>));
-            Assert.AreSame(actual1, actual2, $"{actual1.ID} == {actual2.ID}");
+            Assert.AreSame(actual1, actual2, $"{actual1.TypeName} == {actual2.TypeName}");
         }
 
         [Test]
@@ -78,7 +77,7 @@ namespace MvcSchemaTests.Analyzer
 
             var actual1 = sut.ParseType(array);
 
-            Assert.AreEqual($"{array.GetElementType().GetID()}[]", actual1.ID);
+            Assert.AreEqual(array.GetElementType().GetNamespacedName(), actual1.TypeName);
         }
 
         [Test]
@@ -106,7 +105,7 @@ namespace MvcSchemaTests.Analyzer
             var sut = new TypeParser();
             var actual = sut.ParseType(typeof(POCO));
 
-            Assert.AreEqual(typeof(POCO), actual.ClrType);
+            Assert.AreEqual(typeof(POCO).GetNamespacedName(), actual.TypeName);
 
             var objectType = sut.TypeDescriptors.OfType<ObjectDescriptor>().FirstOrDefault();
             Assert.AreEqual(3, objectType.Properties.Length);

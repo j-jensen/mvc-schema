@@ -36,7 +36,9 @@ namespace MvcSchema.Analyzer.Types
 
         public TypeDescriptor ParseType(Type clrType, params string[] stack)
         {
+            clrType = clrType.GetSimplifiedType();
             var ID = clrType.GetID();
+
             if (stack.Contains(ID))
             {
                 return new Placeholder(ID);
@@ -65,7 +67,7 @@ namespace MvcSchema.Analyzer.Types
                 {
                     underlyingType = ParseType(underlyingClrType, stack);
                 }
-                var nullable = new TypeDescriptor($"{underlyingType.ID}?", underlyingClrType, underlyingType.DataType, Kind.Nullable);
+                var nullable = new TypeDescriptor(underlyingClrType, Kind.Nullable);
                 _typeDescriptors.Add(ID, nullable);
                 return nullable;
             }
@@ -81,16 +83,14 @@ namespace MvcSchema.Analyzer.Types
             // Array
             if (clrType.IsArray)
             {
-                Type arrayType = clrType.GetElementType();
-                return ParseArrayType(arrayType, stack);
-            }
-
-            // Array like
-            Type collectionInterface = clrType.GetInterfaces().FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>));
-            if (collectionInterface != null || clrType.Name == "IEnumerable`1")
-            {
-                Type arrayType = (collectionInterface ?? clrType).GetGenericArguments().First();
-                return ParseArrayType(arrayType, stack);
+                var elementType = clrType.GetElementType();
+                if (!_typeDescriptors.TryGetValue(elementType.GetID(), out TypeDescriptor underlyingType))
+                {
+                    underlyingType = ParseType(elementType, stack);
+                }
+                var array = new TypeDescriptor(elementType, Kind.Array);
+                _typeDescriptors.Add(ID, array);
+                return array;
             }
 
             // Async
@@ -143,7 +143,7 @@ namespace MvcSchema.Analyzer.Types
                 {
                     if (objectType.Properties[i].Type is Placeholder)
                     {
-                        if(_typeDescriptors.TryGetValue(objectType.Properties[i].Type.ID, out TypeDescriptor td))
+                        if(_typeDescriptors.TryGetValue(objectType.Properties[i].Type.TypeName, out TypeDescriptor td))
                         {
                             objectType.Properties[i].Type = td;
                         }
@@ -156,22 +156,6 @@ namespace MvcSchema.Analyzer.Types
             {
                 Description = $"Couldn't parse type: {ID}. Stack: {string.Join('/', stack)}"
             };
-        }
-
-        private TypeDescriptor ParseArrayType(Type arrayType, string[] stack)
-        {
-            var ID = $"{arrayType.GetID()}[]";
-            if (_typeDescriptors.TryGetValue(ID, out var typeDescriptor))
-            {
-                return typeDescriptor;
-            }
-            if (!_typeDescriptors.TryGetValue(arrayType.GetID(), out TypeDescriptor underlyingType))
-            {
-                underlyingType = ParseType(arrayType, stack);
-            }
-            var array = new TypeDescriptor(ID,arrayType,underlyingType.DataType, Kind.Array);
-            _typeDescriptors.Add(ID, array);
-            return array;
         }
 
         private Property[] GetProperties(Type type, string[] stack)

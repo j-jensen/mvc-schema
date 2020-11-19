@@ -18,20 +18,19 @@ namespace MvcSchemaTests.Analyzer
 
             var actual = sut.ParseType(ar);
 
-            Assert.AreEqual(result.GetID(), actual.ID);
+            Assert.AreEqual(result.GetNamespacedName(), actual.TypeName);
         }
 
-        [TestCase(typeof(JsonResult), "JsonString", typeof(string))]
-        [TestCase(typeof(ViewResult), "ViewString", typeof(string))]
-        [TestCase(typeof(ContentResult), "System.String", typeof(string))]
-        public void Derived_from_ActionResult_could_return_type_or_string(Type resultType, string id, Type clrType)
+        [TestCase(typeof(JsonResult), "JsonString")]
+        [TestCase(typeof(ViewResult), "ViewString")]
+        [TestCase(typeof(ContentResult), "System.String")]
+        public void Derived_from_ActionResult_could_return_type_or_string(Type resultType, string id)
         {
             var sut = new TypeParser();
 
             var actual = sut.ParseType(resultType);
 
-            Assert.AreEqual(id, actual.ID);
-            Assert.AreEqual(clrType, actual.ClrType);
+            Assert.AreEqual(id, actual.TypeName);
         }
     }
 }

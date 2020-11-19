@@ -19,7 +19,7 @@ namespace MvcSchemaTests.Analyzer
 
             var actual = sut.ParseType(type);
 
-            Assert.AreEqual(actual.ID, type.GetID());
+            Assert.AreEqual(actual.TypeName, type.GetNamespacedName());
         }
 
         [Test]
