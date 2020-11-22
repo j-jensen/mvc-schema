@@ -25,15 +25,6 @@ namespace MvcSchema.Analyzer.Types
 
         public IEnumerable<TypeDescriptor> TypeDescriptors => _typeDescriptors.Select(td => td.Value);
 
-        public Argument ParseParameter(ParameterDescriptor propertyDescriptor)
-        {
-            return new Argument
-            {
-                Name = propertyDescriptor.Name,
-                Type = ParseType(propertyDescriptor.ParameterType)
-            };
-        }
-
         public TypeDescriptor ParseType(Type clrType, params string[] stack)
         {
             clrType = clrType.GetSimplifiedType();
@@ -67,9 +58,7 @@ namespace MvcSchema.Analyzer.Types
                 {
                     underlyingType = ParseType(underlyingClrType, stack);
                 }
-                var nullable = new TypeDescriptor(underlyingClrType, Kind.Nullable);
-                _typeDescriptors.Add(ID, nullable);
-                return nullable;
+                return underlyingType;
             }
 
             // Enums
@@ -88,9 +77,7 @@ namespace MvcSchema.Analyzer.Types
                 {
                     underlyingType = ParseType(elementType, stack);
                 }
-                var array = new TypeDescriptor(elementType, Kind.Array);
-                _typeDescriptors.Add(ID, array);
-                return array;
+                return underlyingType;
             }
 
             // Async
@@ -113,23 +100,24 @@ namespace MvcSchema.Analyzer.Types
                 PropertyInfo valuePI = clrType.GetProperty("Value", BindingFlags.Public | BindingFlags.Instance);
                 return ParseType(valuePI.PropertyType, stack);
             }
+            
             // Derived from ActionResult MVC
             if (clrType == typeof(ActionResult) || clrType.IsSubclassOf(typeof(ActionResult)))
             {
                 if (clrType == typeof(ViewResult))
                 {
-                    return new TypeDescriptor("ViewString", typeof(string), DataType.String, Kind.None);
+                    return new TypeDescriptor("ViewString", typeof(string), DataType.String);
                 }
                 if (clrType == typeof(JsonResult))
                 {
-                    return new TypeDescriptor("JsonString", typeof(string), DataType.String, Kind.None);
+                    return new TypeDescriptor("JsonString", typeof(string), DataType.String);
                 }
                 return ParseType(typeof(string), stack);
             }
 
             if (clrType.BaseType == typeof(ValueType))
             {
-                var valueType = new TypeDescriptor(ID, clrType, DataType.String, Kind.None);
+                var valueType = new TypeDescriptor(ID, clrType, DataType.String);
                 _typeDescriptors.Add(ID, valueType);
                 return valueType;
             }
@@ -139,16 +127,6 @@ namespace MvcSchema.Analyzer.Types
                 var objectType = new ObjectDescriptor(clrType, GetProperties(clrType, stack));
                 _typeDescriptors.Add(ID, objectType);
 
-                for (int i = 0; i < objectType.Properties.Length; i++)
-                {
-                    if (objectType.Properties[i].Type is Placeholder)
-                    {
-                        if(_typeDescriptors.TryGetValue(objectType.Properties[i].Type.TypeName, out TypeDescriptor td))
-                        {
-                            objectType.Properties[i].Type = td;
-                        }
-                    }
-                }
                 return objectType;
             }
 
@@ -166,10 +144,23 @@ namespace MvcSchema.Analyzer.Types
         }
         public Property ParseProperty(PropertyInfo pi, string[] stack)
         {
+            var typename = ParseType(pi.PropertyType, stack).TypeName;
             return new Property
             {
+                Kind = pi.PropertyType.GetKind(),
                 Name = pi.Name,
-                Type = ParseType(pi.PropertyType, stack)
+                Type = typename
+            };
+        }
+
+        public Argument ParseParameter(ParameterDescriptor propertyDescriptor)
+        {
+            var typename = ParseType(propertyDescriptor.ParameterType).TypeName;
+            return new Argument
+            {
+                Name = propertyDescriptor.Name,
+                Type = typename,
+                Kind = propertyDescriptor.ParameterType.GetKind()
             };
         }
     }

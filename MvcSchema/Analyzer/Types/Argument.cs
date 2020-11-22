@@ -10,6 +10,7 @@ namespace MvcSchema.Analyzer.Types
     public class Identifier
     {
         public string Name { get; set; }
-        public TypeDescriptor Type { get; set; }
+        public string Type { get; set; }
+        public Kind Kind { get; set; }
     }
 }

@@ -6,6 +6,7 @@
         Number,
         String,
         Object,
+        Enum,
         Undefined
     }
 }

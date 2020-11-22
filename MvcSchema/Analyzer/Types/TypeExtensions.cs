@@ -21,25 +21,21 @@ namespace MvcSchema.Analyzer.Types
                 {
                     name = name.Remove(iBacktick);
                 }
-                name += "[";
+                name += "<";
                 Type[] typeParameters = type.GetGenericArguments();
                 for (int i = 0; i < typeParameters.Length; ++i)
                 {
                     string typeParamName = GetID(typeParameters[i]);
                     name += (i == 0 ? typeParamName : "," + typeParamName);
                 }
-                name += "]";
+                name += ">";
             }
 
-            return $"{type.GetKind()}:{type.Namespace}.{name}";
+            return $"{type.Namespace}.{name}";
         }
 
         public static Kind GetKind(this Type type)
         {
-            if (type.IsEnum)
-            {
-                return Kind.Enum;
-            }
             if (Nullable.GetUnderlyingType(type) != null)
             {
                 return Kind.Nullable;
@@ -49,7 +45,7 @@ namespace MvcSchema.Analyzer.Types
                 return Kind.Array;
             }
 
-            return Kind.None;
+            return Kind.Scalar;
         }
 
 

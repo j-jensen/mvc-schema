@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace MvcSchemaTests.Analyzer
+namespace MvcSchemaTests.Analyzer.Types
 {
     public partial class TypeParserTests
     {
@@ -27,14 +27,13 @@ namespace MvcSchemaTests.Analyzer
 
         [TestCase(typeof(int?))]
         [TestCase(typeof(bool?))]
-        public void Nullable_values_should_return_Nullable(Type type)
+        public void Nullable_values_should_return_underlying_type(Type type)
         {
             var sut = new TypeParser();
             var actual = sut.ParseType(type);
             var underlyingType = Nullable.GetUnderlyingType(type);
 
             Assert.AreEqual(underlyingType.GetNamespacedName(), actual.TypeName);
-            Assert.AreEqual(Kind.Nullable, actual.Kind);
         }
 
         [Test]
@@ -43,20 +42,7 @@ namespace MvcSchemaTests.Analyzer
             var sut = new TypeParser();
             var actual = sut.ParseType(typeof(BindingFlags));
 
-            Assert.AreEqual(Kind.Enum, actual.Kind);
-        }
-
-        [TestCase(typeof(string[]))]
-        [TestCase(typeof(ICollection<int>))]
-        [TestCase(typeof(List<Guid>))]
-        [TestCase(typeof(IEnumerable<Tuple<string, string>>))]
-        [TestCase(typeof(IReadOnlyList<object>))]
-        public void Array_like_should_return_KindArray(Type arrayLike)
-        {
-            var sut = new TypeParser();
-
-            var actual = sut.ParseType(arrayLike);
-            Assert.AreEqual(Kind.Array, actual.Kind);
+            Assert.IsInstanceOf<EnumDescriptor>(actual);
         }
 
         [Test]
@@ -84,10 +70,11 @@ namespace MvcSchemaTests.Analyzer
         public void String_should_return_primitive()
         {
             var sut = new TypeParser();
-
             var actual = sut.ParseType(typeof(string));
-            Assert.AreEqual(Kind.None, actual.Kind);
-            Assert.AreEqual(DataType.String, actual.DataType);
+
+            Assert.IsNotInstanceOf<ObjectDescriptor>(actual);
+            Assert.IsInstanceOf<TypeDescriptor>(actual);
+            Assert.AreEqual(typeof(string).GetNamespacedName(), actual.TypeName);
         }
 
         [Test]
@@ -97,7 +84,6 @@ namespace MvcSchemaTests.Analyzer
 
             var actual = sut.ParseType(typeof(void));
             Assert.AreEqual(DataType.Undefined, actual.DataType);
-            Assert.AreEqual(Kind.None, actual.Kind);
         }
         [Test]
         public void POCO_object_should_return_type_with_properties()

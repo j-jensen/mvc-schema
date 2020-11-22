@@ -24,6 +24,7 @@ namespace MvcSchemaTests.Analyzer
                         ParameterType= arg.GetType()
                     }
                     }
+                    
                 }
             }.AsReadOnly(), 1);
             adcp.ActionDescriptors.Returns(adc);

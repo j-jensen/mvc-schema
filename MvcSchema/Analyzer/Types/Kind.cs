@@ -2,9 +2,8 @@
 {
     public enum Kind
     {
-        None,
+        Scalar,
         Nullable,
-        Array,
-        Enum
+        Array
     }
 }

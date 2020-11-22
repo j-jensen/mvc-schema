@@ -6,7 +6,7 @@ using MvcSchema.Analyzer.Types;
 using NUnit.Framework;
 
 
-namespace MvcSchemaTests.Analyzer
+namespace MvcSchemaTests.Analyzer.Types
 {
     public partial class TypeParserTests
     {

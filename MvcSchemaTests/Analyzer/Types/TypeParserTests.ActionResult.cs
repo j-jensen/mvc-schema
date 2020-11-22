@@ -4,7 +4,7 @@ using NUnit.Framework;
 using System;
 using System.Threading.Tasks;
 
-namespace MvcSchemaTests.Analyzer
+namespace MvcSchemaTests.Analyzer.Types
 {
     public partial class TypeParserTests
     {

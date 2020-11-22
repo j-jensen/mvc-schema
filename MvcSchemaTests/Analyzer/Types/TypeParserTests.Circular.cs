@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace MvcSchemaTests.Analyzer
+namespace MvcSchemaTests.Analyzer.Types
 {
     public partial class TypeParserTests
     {

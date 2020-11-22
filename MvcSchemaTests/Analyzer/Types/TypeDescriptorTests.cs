@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace MvcSchemaTests.Analyzer
+namespace MvcSchemaTests.Analyzer.Types
 {
     public class TypeDescriptorTests
     {

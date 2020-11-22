@@ -4,7 +4,7 @@ namespace MvcSchema.Analyzer.Types
 {
     public class EnumDescriptor : TypeDescriptor
     {
-        public EnumDescriptor(Type type) : base(type, Kind.Enum)
+        public EnumDescriptor(Type type) : base(type)
         {
             Values = Enum.GetNames(type);
         }

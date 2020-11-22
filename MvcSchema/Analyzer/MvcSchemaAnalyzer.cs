@@ -82,7 +82,11 @@ namespace MvcSchema.Analyzer
                 if (ad is ControllerActionDescriptor)
                 {
                     ControllerActionDescriptor cad = ad as ControllerActionDescriptor;
-                    info.ReturnType = _typeparser.ParseType(cad.MethodInfo.ReturnType);
+
+                    info.ReturnType = new Identifier { 
+                        Kind = cad.MethodInfo.ReturnType.GetKind(),
+                        Type = _typeparser.ParseType(cad.MethodInfo.ReturnType).TypeName
+                    };
                 }
 
                 // Additional information of invocation

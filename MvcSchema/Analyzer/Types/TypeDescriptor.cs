@@ -6,16 +6,14 @@ namespace MvcSchema.Analyzer.Types
 {
     public class TypeDescriptor
     {
-        public TypeDescriptor(string typeName, Type type, DataType datatype, Kind kind = Kind.None)
+        public TypeDescriptor(string typeName, Type type, DataType datatype)
         {
             TypeName = typeName;
-            Kind = kind;
             DataType = datatype;
         }
-        public TypeDescriptor(Type clrType, Kind kind = Kind.None)
+        public TypeDescriptor(Type clrType)
         {
             TypeName = clrType.GetNamespacedName();
-            Kind = kind;
             if (clrType.IsPrimitive)
             {
                 if (clrType == typeof(bool))
@@ -45,17 +43,7 @@ namespace MvcSchema.Analyzer.Types
             }
         }
 
-        /// <summary>
-        /// Typename.
-        /// </summary>
         public string TypeName { get; private set; }
-        /// <summary>
-        /// Javascript datatype
-        /// </summary>
         public DataType DataType { get; private set; }
-        /// <summary>
-        /// Type capability
-        /// </summary>
-        public Kind Kind { get; private set; }
     }
 }
